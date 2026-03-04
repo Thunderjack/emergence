@@ -70,7 +70,7 @@ $p_e = mysqli_query($link, $p_q);
             //like mechanism...
             $(".like_btn").on("click", function() {
                 let postID = $(this).parent().attr("post-id")
-                let likeCount = parseInt($("#like_cnt_"+postID).text())
+                let likeCount = parseInt($("#like_cnt_" + postID).text())
 
                 $.ajax({
                     url: "../../controller/core.php",
@@ -85,13 +85,33 @@ $p_e = mysqli_query($link, $p_q);
                     success: function(res) {
                         if (res == 0) {
                             $("#like_" + postID).css("background-color", "#2e62d3")
-                            $("#like_cnt_" + postID).html(likeCount+1)
+                            $("#like_cnt_" + postID).html(likeCount + 1)
                         } else {
                             $("#like_" + postID).css("background-color", "#99a5b3")
-                            $("#like_cnt_" + postID).html(likeCount-1)
+                            $("#like_cnt_" + postID).html(likeCount - 1)
                         }
+                    },
+
+                    error: function() {
+                        alert("Erreur")
                     }
                 })
+            })
+
+            //
+            $(".new_post_btn").on("mouseenter", function() {
+                //
+                $(".new_post_div").css("background-color", "#09ce6c")
+                $(".new_post_div").css("color", "white")
+                $(this).css("background-color", "#ffffff")
+                $(this).css("color", "grey")
+            })
+            $(".new_post_btn").on("mouseleave", function() {
+                //
+                $(".new_post_div").css("background-color", "white")
+                $(".new_post_div").css("color", "black")
+                $(this).css("background-color", "#20cc62")
+                $(this).css("color", "white")
             })
 
         })
@@ -132,7 +152,7 @@ $p_e = mysqli_query($link, $p_q);
             <div class="divs home_div" style="height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
                 <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">FIL D'ACTUALITES</b>
                 <hr>
-                <div style="border-radius: 10px; padding: 7px; border: #09ce6c solid 1px; display: flex; justify-content: space-between;">
+                <div class="new_post_div" style="border-radius: 10px; padding: 7px; border: #09ce6c solid 1px; display: flex; justify-content: space-between;">
                     <div style="display: flex; justify-content: start;">
                         <div style="margin-right: 7px;"><img src="../../model/ico/school.png" width="40px" height="40px" style="border-radius: 50%;" draggable="false"></div>
                         <div><b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">INSTITUT AFRICAIN DES ENSEIGNEMENTS SECONDAIRES</b><br><span style="filter: opacity(0.5);">Faites un Post pour votre communauté!</span></div>
