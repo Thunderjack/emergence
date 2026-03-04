@@ -130,7 +130,7 @@
             </div><hr>
             <div align="center">
                 <label for="post_txt">
-                    <legend>Description du Post</legend>
+                    <legend>Descriptions du Post</legend>
                     <textarea cols="30" rows="5" id="post_txt" style="width: 100%; border-radius: 8px; background-color: #ebebeb; outline: none; border: #4e4e4e41 solid 1px; padding: 6px;"></textarea>
                 </label>
             </div>
