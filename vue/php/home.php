@@ -166,7 +166,7 @@
                     </div>
                 </div><br>
 
-                <form action="" method="POST" enctype="multipart/form-data" style="margin-bottom: 0px;">
+                <form action="../../controller/core.php" method="POST" enctype="multipart/form-data" style="margin-bottom: 0px;">
                     <label for="post_txt">
                         <legend style="font-size: 12px;">Descriptions du Post</legend>
                         <textarea cols="30" name="p_text" rows="5" id="post_txt"
@@ -186,6 +186,7 @@
                     <div align="center" style="margin-top: 10px;">
                         <input type="text" name="p_type" class="p_type" value="0" hidden>
                         <input type="text" name="p_file_type" class="p_file_type" value="0" hidden>
+                        <input type="text" name="p_submitter" class="p_submitter" value="Shadow" hidden>
                         <input type="submit" name="p_submit" value="Publier" style="background-color: #18b353; color: white; padding: 6px; font-weight: bold; border-radius: 4px; padding-left: 12px; padding-right: 12px; cursor: pointer; outline: none; border: #157e3d; width: 100px;">
                     </div>
                 </form>
