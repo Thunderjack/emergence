@@ -44,6 +44,31 @@
         
     }
 
+    function likeMechanism($postID, $userID){
+        $link = mysqli_connect("localhost", "root", "", "emergence");
+        $link->set_charset("utf8");
+
+        $q = "SELECT * FROM posts_likes_log WHERE post_id = '$postID' AND usr_id = '$userID' LIMIT 1";
+        $e = mysqli_query($link, $q);
+        $r = mysqli_num_rows($e);
+
+        echo $r;
+
+        if ($r == 0) {
+            $u = "INSERT INTO posts_likes_log(post_id, usr_id) VALUES('$postID', '$userID')";
+            mysqli_query($link, $u);
+
+            $w = "UPDATE posts SET post_likes = post_likes + 1 WHERE id = '$postID'";
+            mysqli_query($link, $w);
+        }else{
+            $d = "DELETE FROM posts_likes_log WHERE post_id = '$postID' AND usr_id = '$userID'";
+            mysqli_query($link, $d);
+
+            $x = "UPDATE posts SET post_likes = post_likes - 1 WHERE id = '$postID'";
+            mysqli_query($link, $x);
+        }
+    }
+
     //handlers_______________________________________________________________
     if (isset($_POST["p_submit"])) {
 
@@ -60,5 +85,9 @@
 
             newPostSubmit($postType, $postText, "", "", $submitter);
         }
+    }
+
+    if (isset($_POST["likeMechanismTrigger"])) {
+       echo likeMechanism($_POST["post_id"], $_POST["user"]);
     }
 ?>

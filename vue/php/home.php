@@ -16,6 +16,9 @@ $p_e = mysqli_query($link, $p_q);
 
     <script>
         $(document).ready(function() {
+            let userID = $("body").attr("host")
+            $("body").attr("host", "")
+
             $(".sw_btn").on("click", function() {
                 let tag = $(this).attr("data")
 
@@ -67,19 +70,25 @@ $p_e = mysqli_query($link, $p_q);
             //like mechanism...
             $(".like_btn").on("click", function() {
                 let postID = $(this).parent().attr("post-id")
-                let likeCount = parseInt($(this).text())
+                let likeCount = parseInt($("#like_cnt_"+postID).text())
 
                 $.ajax({
                     url: "../../controller/core.php",
                     method: "POST",
+                    async: false,
                     data: {
-                        post_id: postID
+                        likeMechanismTrigger: true,
+                        post_id: postID,
+                        user: userID,
                     },
-                    success: function(response) {
-                        if (response == "liked") {
-                            btn.text(likeCount + 1)
-                        } else if (response == "unliked") {
-                            btn.text(likeCount - 1)
+
+                    success: function(res) {
+                        if (res == 0) {
+                            $("#like_" + postID).css("background-color", "#2e62d3")
+                            $("#like_cnt_" + postID).html(likeCount+1)
+                        } else {
+                            $("#like_" + postID).css("background-color", "#99a5b3")
+                            $("#like_cnt_" + postID).html(likeCount-1)
                         }
                     }
                 })
@@ -89,7 +98,7 @@ $p_e = mysqli_query($link, $p_q);
     </script>
 </head>
 
-<body style="margin: 0px; background-color: #e6e6e6;">
+<body style="margin: 0px; background-color: #e6e6e6;" host="Shadow">
     <div style="background-color: #6b3cb8; height: fit-content; padding: 5px; display: flex; justify-content: start;">
         <div>
             <img src="../../model/logo/Logo.jpeg" draggable="false" height="50px" width="50px">
@@ -144,7 +153,7 @@ $p_e = mysqli_query($link, $p_q);
                         $path = "";
                         $type = "";
                         $postLiked = false;
-                        $user = "";
+                        $user = "Shadow";
                         $pid = $post["id"];
 
                         $a = "SELECT * FROM posts_likes_log WHERE usr_id = '$user' AND post_id = '$pid' LIMIT 1";
@@ -171,8 +180,8 @@ $p_e = mysqli_query($link, $p_q);
                                     <div><b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><?= $post['post_usr'] ?></b><br><span style="filter: opacity(0.5);"><?= $post['post_date_time'] ?></span></div>
                                 </div>
                                 <div style="display: flex;" post-id="<?= $post['id'] ?>">
-                                    <div class="like_btn" style="margin-top: auto; margin-bottom: auto; background-color: <?= $postLiked ? "#2e62d3" : "#99a5b3" ?>; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; margin-right: 4px; display: flex;"><img src="../../model/ico/like.png" draggable="false" width="15px" style="margin-right: 4px; filter: invert();"><?= $post['post_likes'] ?></div>
-                                    <div class="cmt_btn" style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;"><?= $post['post_cmt'] ?></div>
+                                    <div class="like_btn" id="like_<?= $post['id'] ?>" style="margin-top: auto; margin-bottom: auto; background-color: <?= $postLiked ? "#2e62d3" : "#99a5b3" ?>; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; margin-right: 4px; display: flex;"><img src="../../model/ico/like.png" draggable="false" width="15px" style="margin-right: 4px; filter: invert();"><span class="like_cnt" id="like_cnt_<?= $post['id'] ?>"><?= $post['post_likes'] ?></span></div>
+                                    <div class="cmt_btn" id="cmt_<?= $post['id'] ?>" style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;"><?= $post['post_cmt'] ?></div>
                                 </div>
                             </div>
 
