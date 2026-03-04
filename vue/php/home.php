@@ -1,8 +1,13 @@
 <?php
-    include "../../controller/database.php";
+include "../../controller/database.php";
+
+//get posts...
+$p_q = "SELECT * FROM posts ORDER BY id DESC LIMIT 10";
+$p_e = mysqli_query($link, $p_q);
 ?>
 
-<html lang="en">
+<html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +25,7 @@
                 $(this).css("background-color", "#6b3cb8")
 
                 $(".divs").hide()
-                $("."+tag+"_div").show()
+                $("." + tag + "_div").show()
             })
 
             $(".post_type_btn").on("click", function() {
@@ -38,9 +43,9 @@
 
                     if (tag == "1") {
                         $(".hook").text("vidéo")
-                        $("#post_illust").attr("accept", ".mp4, .avi, .mkv")
+                        $("#post_illust").attr("accept", ".mp4, .avi, .mkv, .wmv")
                         $(".p_file_type").attr("value", "1")
-                    }else{
+                    } else {
                         $(".hook").text("image")
                         $("#post_illust").attr("accept", ".jpg, .jpeg, .png")
                         $(".p_file_type").attr("value", "0")
@@ -51,9 +56,39 @@
                 }
             })
 
+            $(".new_post_btn").on("click", function() {
+                $(".new_post_modal").css("display", "flex")
+            })
+
+            $(".new_post_close").on("click", function() {
+                $(".new_post_modal").css("display", "none")
+            })
+
+            //like mechanism...
+            $(".like_btn").on("click", function() {
+                let postID = $(this).parent().attr("post-id")
+                let likeCount = parseInt($(this).text())
+
+                $.ajax({
+                    url: "../../controller/core.php",
+                    method: "POST",
+                    data: {
+                        post_id: postID
+                    },
+                    success: function(response) {
+                        if (response == "liked") {
+                            btn.text(likeCount + 1)
+                        } else if (response == "unliked") {
+                            btn.text(likeCount - 1)
+                        }
+                    }
+                })
+            })
+
         })
     </script>
 </head>
+
 <body style="margin: 0px; background-color: #e6e6e6;">
     <div style="background-color: #6b3cb8; height: fit-content; padding: 5px; display: flex; justify-content: start;">
         <div>
@@ -86,54 +121,120 @@
         <div style="padding: 5px; border-radius: 10px; width: 92%; background-color: white; border: #cecece solid 1px;" class="master">
             <!--master divisions...-->
             <div class="divs home_div" style="height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
-                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">FIL D'ACTUALITES</b><hr>
+                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">FIL D'ACTUALITES</b>
+                <hr>
                 <div style="border-radius: 10px; padding: 7px; border: #09ce6c solid 1px; display: flex; justify-content: space-between;">
                     <div style="display: flex; justify-content: start;">
                         <div style="margin-right: 7px;"><img src="../../model/ico/school.png" width="40px" height="40px" style="border-radius: 50%;" draggable="false"></div>
                         <div><b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">INSTITUT AFRICAIN DES ENSEIGNEMENTS SECONDAIRES</b><br><span style="filter: opacity(0.5);">Faites un Post pour votre communauté!</span></div>
                     </div>
-                    <div style="margin-top: auto; margin-bottom: auto; background-color: #20cc62; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer;;">+ Nouveau</div>
-                </div><hr>
+                    <div class="new_post_btn" style="margin-top: auto; margin-bottom: auto; background-color: #20cc62; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer;;">+ Nouveau</div>
+                </div>
+                <hr>
 
                 <!--posts...-->
-                <div style="border-radius: 10px; padding: 7px; border: #4e4e4e41 solid 1px; margin-bottom: 5px;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: #4e4e4e41 solid 1px; padding-bottom: 8px; position: sticky; top: 0px; background-color: white;">
-                        <div style="display: flex; justify-content: start;">
-                            <div style="margin-right: 7px;"><img src="../../model/ico/school.png" width="40px" height="40px" style="border-radius: 50%;" draggable="false"></div>
-                            <div><b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">INSTITUT AFRICAIN DES ENSEIGNEMENTS SECONDAIRES</b><br><span style="filter: opacity(0.5);">Mercredi 04 Mars 2026 - 09:32</span></div>
-                        </div>
-                        <div style="display: flex;">
-                            <div style="margin-top: auto; margin-bottom: auto; background-color: #2e62d3; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; margin-right: 4px; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;">12</div>
-                            <div style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;">03</div>
-                        </div>
-                    </div>
+                <?php
+                //get posts...
+                if (mysqli_num_rows($p_e) == 0) {
+                ?>
+                    <div align="center"><small style="filter: opacity(0.6);">Rien à afficher pour l'instant!</small></div>
+                    <?php
+                } else {
+                    while ($post = mysqli_fetch_assoc($p_e)) {
+                        $path = "";
+                        $type = "";
+                        $postLiked = false;
+                        $user = "";
+                        $pid = $post["id"];
 
-                    <div style="border-radius: 10px; padding-top: 8px; padding-bottom: 8px; display: flex; justify-content: start;" align="center">
-                        <div style="width: 45%;">
-                            <img src="../../mars-IgUR1iX0mqM-unsplash.jpg" width="75%" draggable="false">
-                        </div>
-                        <div style="width: 55%;" align="center">Les JPO sont en approches, et la classe de Tle Informatique se démènent pour finir a temps leur projet Reseau Social. Reussirons-t-ils avant la fin du temps imparti? Vous le saurez très prochainement.</div>
-                    </div>
-                </div><br>
+                        $a = "SELECT * FROM posts_likes_log WHERE usr_id = '$user' AND post_id = '$pid' LIMIT 1";
+                        $b = mysqli_query($link, $a);
+                        if (mysqli_num_rows($b) > 0) {
+                            $postLiked = true;
+                        }
 
-                <div align="center"><small style="filter: opacity(0.6);">-Rafraichir pour voir plus!-</small></div>
+                        if ($post["post_type"] == "1") {
+                            $pType = $post["post_type"];
+                            $pID = $post["id"];
+
+                            $q = "SELECT * FROM posts_illustrations WHERE post_id = '$pID' LIMIT 1";
+                            $e = mysqli_query($link, $q);
+                            $r = mysqli_fetch_assoc($e);
+                            $path = $r["illust_path"];
+                            $type = $r["illust_type"];
+                        }
+                    ?>
+                        <div style="border-radius: 10px; padding: 7px; border: #4e4e4e41 solid 1px; margin-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: #4e4e4e41 solid 1px; padding-bottom: 8px; position: sticky; top: 0px; background-color: white;">
+                                <div style="display: flex; justify-content: start;">
+                                    <div style="margin-right: 7px;"><img src="../../model/ico/school.png" width="40px" height="40px" style="border-radius: 50%;" draggable="false"></div>
+                                    <div><b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><?= $post['post_usr'] ?></b><br><span style="filter: opacity(0.5);"><?= $post['post_date_time'] ?></span></div>
+                                </div>
+                                <div style="display: flex;" post-id="<?= $post['id'] ?>">
+                                    <div class="like_btn" style="margin-top: auto; margin-bottom: auto; background-color: <?= $postLiked ? "#2e62d3" : "#99a5b3" ?>; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; margin-right: 4px; display: flex;"><img src="../../model/ico/like.png" draggable="false" width="15px" style="margin-right: 4px; filter: invert();"><?= $post['post_likes'] ?></div>
+                                    <div class="cmt_btn" style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;"><?= $post['post_cmt'] ?></div>
+                                </div>
+                            </div>
+
+                            <div style="border-radius: 10px; padding-top: 8px; padding-bottom: 8px; display: flex; justify-content: start;" align="center">
+                                <?php
+                                if ($post["post_type"] == "1") {
+                                ?>
+                                    <div style="width: 45%;">
+                                        <?php
+                                        if ($type == "0") {
+                                        ?>
+                                            <img src="<?= $path ?>" width="75%" draggable="false">
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <video width="100%" controls>
+                                                <source src="<?= $path ?>" type="video/mp4">
+                                                Votre navigateur ne prend pas en charge les lecteurs Vidéo.
+                                            </video>
+                                        <?php
+                                        }
+
+                                        ?>
+                                    </div>
+                                <?php
+                                }
+                                ?>
+                                <div style="width: <?php if ($post["post_type"] == "1") {
+                                                        echo "55%";
+                                                    } else {
+                                                        echo "100%";
+                                                    } ?>" align="center"><?= $post['post_txt'] ?></div>
+                            </div>
+                        </div><br>
+                    <?php
+                    }
+                    ?>
+                    <div align="center"><small style="filter: opacity(0.6);">-Rafraichir pour voir plus!-</small></div>
+                <?php
+                }
+                ?>
 
             </div>
 
             <div class="divs chat_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
-                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">DISCUSSIONS</b><hr>
+                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">DISCUSSIONS</b>
+                <hr>
             </div>
 
             <div class="divs notif_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
-                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">NOTIFICATIONS</b><hr>
+                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">NOTIFICATIONS</b>
+                <hr>
             </div>
 
             <div class="divs setting_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
-                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">PARAMETRES</b><hr>
+                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">PARAMETRES</b>
+                <hr>
             </div>
 
             <div class="profile_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
-                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">MON PROFIL</b><hr>
+                <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">MON PROFIL</b>
+                <hr>
             </div>
         </div>
 
@@ -150,13 +251,14 @@
 
 
     <!--modals-->
-    <div style="background-color: rgba(0, 0, 0, 0.705); z-index: 2; position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center;">
+    <div class="new_post_modal" style="background-color: rgba(0, 0, 0, 0.705); z-index: 2; position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: none; justify-content: center;">
         <div style="margin: auto; background-color: white; border-radius: 4px; padding: 5px; width: 560px;">
             <div style="display: flex; justify-content: space-between;">
                 <div style="width: 30px;"></div>
                 <div style="font-size: 20px; font-weight: bold;">Nouveau Post</div>
-                <div style="width: 30px;"><span style="border-radius: 50%; background-color: #d32e2e; color: white; font-weight: bold; padding-left: 6px; padding-right: 6px; padding-top: 2px; padding-bottom: 2px;">X</span></div>
-            </div><hr>
+                <div style="width: 30px;"><span style="border-radius: 50%; background-color: #d32e2e; color: white; font-weight: bold; padding-left: 6px; padding-right: 6px; padding-top: 2px; padding-bottom: 2px; cursor: pointer;" class="new_post_close">X</span></div>
+            </div>
+            <hr>
             <div align="center">
                 <div align="center" style="padding: 5px; background-color: #ebebeb; border-radius: 8px; border: #4e4e4e41 solid 1px;">
                     <div style="display: flex; justify-content: space-between; width: 38%;">
@@ -173,7 +275,7 @@
                             style="width: 100%; border-radius: 8px; background-color: #ebebeb; outline: none; border: #4e4e4e41 solid 1px; padding: 6px;"
                             placeholder="256 Caracteres maximum..."></textarea>
                     </label>
-                    
+
                     <label class="illust_cont" for="post_illust" style="cursor: pointer; display: none;">
                         <div
                             style="display: flex; justify-content: start; border: #6b3cb8 dotted 3px; border-radius: 8px; margin-top: 7px; padding-left: 8px;">
@@ -195,4 +297,5 @@
         </div>
     </div>
 </body>
+
 </html>

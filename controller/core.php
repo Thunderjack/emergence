@@ -1,5 +1,8 @@
 <?php
 
+    $link = mysqli_connect("localhost", "root", "", "emergence");
+    $link->set_charset("utf8");
+
     //functions______________________________________________________________
     function newPostSubmit($postType, $postText, $postIllustration, $postIllustrationType, $submitter){
         $link = mysqli_connect("localhost", "root", "", "emergence");
@@ -10,7 +13,8 @@
         $postID = mysqli_insert_id($link);
 
         if (!$e1) {
-            echo "Error: " . mysqli_error($link);    
+            echo "<script>alert('Erreur: " . mysqli_error($link)."');</script>";
+            echo "<script>location.replace('../vue/php/home.php');</script>";    
         } else {
             
             if ($postType == "1") {
@@ -22,18 +26,19 @@
                 $i = rand(1111, 99999);
                 $illustArray = explode(".", $illustration);
                 $newFile = "ILL-" . $postID . "_ID-" . $i . "_YR-" . date("y") . "." . end($illustArray);
-                $illust = "../../../model/posts/" . $newFile;
+                $illust = "../../model/posts/" . $newFile;
                 move_uploaded_file($illustration_tmp, $path . $newFile);
 
                 $q2 = "INSERT INTO posts_illustrations(post_id, illust_path, illust_type) VALUES('$postID', '$illust', '$postIllustrationType')";
                 $e2 = mysqli_query($link, $q2);
                 if (!$e2) {
-                    echo "Error: " . mysqli_error($link);    
+                    echo "<script>alert('Erreur: " . mysqli_error($link)."');</script>";
+                    echo "<script>location.replace('../vue/php/home.php');</script>";    
                 }else{
-                    echo "Post created successfully.";
+                    echo "<script>location.replace('../vue/php/home.php');</script>";
                 }
             }else{
-                echo "Post created successfully.";
+                echo "<script>location.replace('../vue/php/home.php');</script>";
             }
         }
         
@@ -43,7 +48,7 @@
     if (isset($_POST["p_submit"])) {
 
         $postType = $_POST["p_type"];
-        $postText = $_POST["p_text"];
+        $postText = mysqli_real_escape_string($link, $_POST["p_text"]);
         $submitter = $_POST["p_submitter"];
 
         if ($postType == "1") {
