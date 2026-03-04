@@ -22,6 +22,35 @@
                 $(".divs").hide()
                 $("."+tag+"_div").show()
             })
+
+            $(".post_type_btn").on("click", function() {
+                let tag = $(this).attr("value")
+
+                $(".post_type_btn").css("background-color", "unset").css("color", "black")
+                $(".post_type_btn").css("color", "black")
+                $(this).css("background-color", "#6b3cb8").css("color", "white")
+                $(this).css("color", "white")
+
+                if (tag == "x") {
+                    $(".illust_cont").hide()
+                    $(".p_type").attr("value", "0")
+                } else {
+
+                    if (tag == "1") {
+                        $(".hook").text("vidéo")
+                        $("#post_illust").attr("accept", ".mp4, .avi, .mkv")
+                        $(".p_file_type").attr("value", "1")
+                    }else{
+                        $(".hook").text("image")
+                        $("#post_illust").attr("accept", ".jpg, .jpeg, .png")
+                        $(".p_file_type").attr("value", "0")
+                    }
+
+                    $(".illust_cont").show()
+                    $(".p_type").attr("value", "1")
+                }
+            })
+
         })
     </script>
 </head>
@@ -129,10 +158,38 @@
                 <div style="width: 30px;"><span style="border-radius: 50%; background-color: #d32e2e; color: white; font-weight: bold; padding-left: 6px; padding-right: 6px; padding-top: 2px; padding-bottom: 2px;">X</span></div>
             </div><hr>
             <div align="center">
-                <label for="post_txt">
-                    <legend>Descriptions du Post</legend>
-                    <textarea cols="30" rows="5" id="post_txt" style="width: 100%; border-radius: 8px; background-color: #ebebeb; outline: none; border: #4e4e4e41 solid 1px; padding: 6px;"></textarea>
-                </label>
+                <div align="center" style="padding: 5px; background-color: #ebebeb; border-radius: 8px; border: #4e4e4e41 solid 1px;">
+                    <div style="display: flex; justify-content: space-between; width: 38%;">
+                        <div class="post_type_btn" value="0" style="border-radius: 8px; padding: 2px; color: rgb(0, 0, 0); width: 65px; font-size: 12px; cursor: pointer;">Image</div>
+                        <div class="post_type_btn" value="x" style="background-color: #6b3cb8; border-radius: 8px; padding: 2px; color: white; width: 65px; font-size: 12px; cursor: pointer;">Texte</div>
+                        <div class="post_type_btn" value="1" style="border-radius: 8px; padding: 2px; color: rgb(0, 0, 0); width: 65px; font-size: 12px; cursor: pointer;">Video</div>
+                    </div>
+                </div><br>
+
+                <form action="" method="POST" enctype="multipart/form-data" style="margin-bottom: 0px;">
+                    <label for="post_txt">
+                        <legend style="font-size: 12px;">Descriptions du Post</legend>
+                        <textarea cols="30" name="p_text" rows="5" id="post_txt"
+                            style="width: 100%; border-radius: 8px; background-color: #ebebeb; outline: none; border: #4e4e4e41 solid 1px; padding: 6px;"
+                            placeholder="256 Caracteres maximum..."></textarea>
+                    </label>
+                    
+                    <label class="illust_cont" for="post_illust" style="cursor: pointer; display: none;">
+                        <div
+                            style="display: flex; justify-content: start; border: #6b3cb8 dotted 3px; border-radius: 8px; margin-top: 7px; padding-left: 8px;">
+                            <div style="margin-right: 5px;"><img src="../../model/ico/load.png" height="40px" draggable="false"></div>
+                            <div style="display: flex;"><span style="margin: auto; font-weight: bolder; color: #6b3cb8;">Choisir une <span
+                                        class="hook">Image</span> pour accompagner votre post!</span></div>
+                        </div>
+                        <input type="file" name="p_file" id="post_illust" accept=".png, .jpg, .jpeg" hidden>
+                    </label>
+                    <div align="center" style="margin-top: 10px;">
+                        <input type="text" name="p_type" class="p_type" value="0" hidden>
+                        <input type="text" name="p_file_type" class="p_file_type" value="0" hidden>
+                        <input type="submit" name="p_submit" value="Publier" style="background-color: #18b353; color: white; padding: 6px; font-weight: bold; border-radius: 4px; padding-left: 12px; padding-right: 12px; cursor: pointer; outline: none; border: #157e3d; width: 100px;">
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
