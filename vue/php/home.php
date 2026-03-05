@@ -171,7 +171,7 @@ $p_e = mysqli_query($link, $p_q);
                                         <div class='com_comer com_` + comment.split("_+_")[0] + `' style='border-radius:5px; display:flex; justify-content:space-between; margin-bottom:4px; padding:4px;'>
                                             <div style='display:flex; justify-content:start;'>
                                                 <div><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/user.png' height='30px' draggable='false'></div>
-                                                <div style='margin-left:4px; font-size:12px;'><b>` + comment.split("_+_")[1] + `<span style='filter:opacity(0.6);'> | ` + comment.split("_+_")[3] + `</span></b><br><i>` + comment.split("_+_")[2] + ` (`+replies.length+` reponses)</i></div>
+                                                <div style='margin-left:4px; font-size:12px;'><b>` + comment.split("_+_")[1] + `<span style='filter:opacity(0.6);'> | ` + comment.split("_+_")[3] + `</span></b><br><i>` + comment.split("_+_")[2] + ` (` + replies.length + ` reponses)</i></div>
                                             </div>
                                             <div class='reply_trigger' com-id='` + comment.split("_+_")[0] + `' style='cursor:pointer;'><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/reply.png' height='13px' draggable='false'></div>
                                         </div>
@@ -427,6 +427,45 @@ $p_e = mysqli_query($link, $p_q);
             <div class="divs chat_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
                 <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; filter: opacity(0.8); font-size: 20px;">DISCUSSIONS</b>
                 <hr>
+                <div style="display: flex; justify-content: start;">
+
+                    <div class="chat_left" style="width: 100%; padding: 7px;">
+                        <div style="padding:5px;">
+                            <div style="background-color: #6b3cb8; color: white; border: #00000059 solid 1px;">
+                                <div style="display: flex; margin-bottom: 5px; padding: 5px;">
+                                    <div style="width: 100%;">
+                                        <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">VOS GROUPES DE DISCUSSIONS</b>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="background-color: #cacaca; color: #000000; border-bottom: #00000059 solid 1px; cursor: pointer;">
+                                        <div style="display: flex; justify-content: space-between; padding: 5px;">
+                                            <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Terminale TI</b>
+                                            <small style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Dernier message il y a 2h</small>
+                                        </div>
+                                    </div>
+
+                                    <div style="background-color: #cacaca; color: #000000; border-bottom: #00000059 solid 1px; cursor: pointer;">
+                                        <div style="display: flex; justify-content: space-between; padding: 5px;">
+                                            <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Premiere TI</b>
+                                            <small style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Dernier message il y a 30min</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background-color: #6b3cb8; color: white; margin-top: 10px; border: #00000059 solid 1px;">
+                                <div style="display: flex; margin-bottom: 5px; padding: 5px;">
+                                    <div style="width: 100%;">
+                                        <b style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">VOS CORRESPONDANTS</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat_right" style="width: 56%; border-left: #0000003b solid 1px; background-color: #dfdfdf; padding: 7px; display:none"></div>
+                </div>
             </div>
 
             <div class="divs notif_div" style="display: none; height: 100%; overflow-x: hidden; overflow-y: auto; border-radius:10px; padding-left: 8px; padding-right: 8px;">
