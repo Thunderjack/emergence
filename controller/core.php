@@ -69,6 +69,71 @@
         }
     }
 
+    function getPostComments($postID){
+        $link = mysqli_connect("localhost", "root", "", "emergence");
+        $link->set_charset("utf8");
+
+        $u = "SELECT * FROM posts_cmts_log WHERE post_id = '$postID' AND cmt_type = '0' ORDER BY id DESC";
+        $v = mysqli_query($link, $u);
+        $w = mysqli_num_rows($v);
+
+        if ($w == 0) {
+            echo $w;
+        }else{
+            $comments = [];
+
+            while ($com = mysqli_fetch_assoc($v)) {
+                $comments[] = $com["id"]."_+_". $com["usr_id"]."_+_".$com["cmt_txt"] . "_+_" . $com["date_time"];
+            }
+
+            echo json_encode($comments);
+        }
+    }
+
+    function submitComment($postID, $userID, $commentContent, $mode, $to){
+        $link = mysqli_connect("localhost", "root", "", "emergence");
+        $link->set_charset("utf8");
+
+        $u = "";
+        if ($mode == "1") {
+            $u = "INSERT INTO posts_cmts_log(post_id, cmt_type, usr_id, cmt_txt) VALUES('$postID', '0', '$userID', '$commentContent')";
+        }else{
+            $u = "INSERT INTO posts_cmts_log(post_id, cmt_type, usr_id, cmt_txt, reply_to) VALUES('$postID', '1', '$userID', '$commentContent', '$to')";
+        }
+        $v = mysqli_query($link, $u);
+        if ($v) {
+            echo 0;
+
+            $w = "UPDATE posts SET post_cmt = post_cmt + 1 WHERE id = '$postID'";
+            mysqli_query($link, $w);
+        } else {
+            echo 1;
+        }
+        
+    }
+
+    function getReplies($postID, $comentID){
+        $link = mysqli_connect("localhost", "root", "", "emergence");
+        $link->set_charset("utf8");
+
+        $u = "SELECT * FROM posts_cmts_log WHERE cmt_type = '1' AND post_id = '$postID' AND reply_to = '$comentID' ORDER BY id ASC";
+        $v = mysqli_query($link, $u);
+        $w = mysqli_num_rows($v);
+        if ($w == 0) {
+
+            echo 0;
+        } else {
+            $replies = [];
+
+            while ($x = mysqli_fetch_assoc($v)) {
+                $replies[] = $x["usr_id"]."_+_".$x["cmt_txt"]. "_+_" . $x["date_time"];
+            }
+
+            echo json_encode($replies);
+        }
+        
+    }
+
     //handlers_______________________________________________________________
     if (isset($_POST["p_submit"])) {
 
@@ -89,5 +154,17 @@
 
     if (isset($_POST["likeMechanismTrigger"])) {
        echo likeMechanism($_POST["post_id"], $_POST["user"]);
+    }
+
+    if (isset($_POST["getCommentsTrigger"])) {
+        echo getPostComments($_POST["pid"]);
+    }
+
+    if (isset($_POST["newCommentTrigger"])) {
+        echo submitComment($_POST["pid"], $_POST["submitter"], mysqli_real_escape_string($link, $_POST["text"]), $_POST["mode"], $_POST["to"]);
+    }
+
+    if (isset($_POST["getRepliesTrigger"])) {
+        echo getReplies($_POST["post"], $_POST["cID"]);
     }
 ?>

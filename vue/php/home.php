@@ -17,6 +17,10 @@ $p_e = mysqli_query($link, $p_q);
     <script>
         $(document).ready(function() {
             let userID = $("body").attr("host")
+            let viewedPostID = null
+            let replyMode = 1 //1 for false, 0 for true...
+            let replyTo = null
+
             $("body").attr("host", "")
 
             $(".sw_btn").on("click", function() {
@@ -67,6 +71,10 @@ $p_e = mysqli_query($link, $p_q);
                 $(".new_post_modal").css("display", "none")
             })
 
+            $(".comment_close").on("click", function() {
+                $(".comment_modal").css("display", "none")
+            })
+
             //like mechanism...
             $(".like_btn").on("click", function() {
                 let postID = $(this).parent().attr("post-id")
@@ -94,6 +102,176 @@ $p_e = mysqli_query($link, $p_q);
 
                     error: function() {
                         alert("Erreur")
+                    }
+                })
+            })
+
+            $(".cmt_btn").on("click", function() {
+                let id = $(this).parent().attr("post-id")
+                viewedPostID = id
+
+                $.ajax({
+                    url: "../../controller/core.php",
+                    method: "POST",
+
+                    data: {
+                        getCommentsTrigger: true,
+                        pid: id,
+                    },
+
+                    beforeSend: function() {
+                        $(".cmt_div").html("")
+                    },
+
+                    success: function(data) {
+                        if (data == 0) {
+                            $(".cmt_div").html("<div align='center'><small style='filter:opacity(0.7);'>Soyez le premier à commenter!</small></div>")
+                            $(".comment_modal").css("display", "flex")
+                        } else {
+                            let postComments = JSON.parse(data)
+
+                            //
+                            $.each(postComments, function(key, comment) {
+
+                                //get replies...
+                                let comID = comment.split("_+_")[0]
+                                $.ajax({
+                                    url: "../../controller/core.php",
+                                    method: "POST",
+
+                                    data: {
+                                        //
+                                        getRepliesTrigger: true,
+                                        cID: comID,
+                                        post: viewedPostID,
+                                    },
+
+                                    success: function(newData) {
+                                        if (newData == 0) {
+
+                                            //no comments...
+                                            $(".cmt_div").append(`
+                                    <div style='background-color:white; margin-bottom:4px; padding:4px; border:#cecece solid 1px; border-radius:4px;'>
+                                        <div class='com_comer com_` + comment.split("_+_")[0] + `' style='border-radius:5px; display:flex; justify-content:space-between; margin-bottom:4px; padding:4px;'>
+                                            <div style='display:flex; justify-content:start;'>
+                                                <div><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/user.png' height='30px' draggable='false'></div>
+                                                <div style='margin-left:4px; font-size:12px;'><b>` + comment.split("_+_")[1] + `<span style='filter:opacity(0.6);'> | ` + comment.split("_+_")[3] + `</span></b><br><i>` + comment.split("_+_")[2] + `</i></div>
+                                            </div>
+                                            <div class='reply_trigger' com-id='` + comment.split("_+_")[0] + `' style='cursor:pointer;'><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/reply.png' height='13px' draggable='false'></div>
+                                        </div>
+                                    </div>
+                                `)
+                                        } else {
+
+                                            //valid comments...
+                                            let replies = JSON.parse(newData)
+
+                                            $(".cmt_div").append(`
+                                    <div style='background-color:white; margin-bottom:4px; padding:4px; border:#cecece solid 1px; border-radius:4px;'>
+                                        <div class='com_comer com_` + comment.split("_+_")[0] + `' style='border-radius:5px; display:flex; justify-content:space-between; margin-bottom:4px; padding:4px;'>
+                                            <div style='display:flex; justify-content:start;'>
+                                                <div><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/user.png' height='30px' draggable='false'></div>
+                                                <div style='margin-left:4px; font-size:12px;'><b>` + comment.split("_+_")[1] + `<span style='filter:opacity(0.6);'> | ` + comment.split("_+_")[3] + `</span></b><br><i>` + comment.split("_+_")[2] + ` (`+replies.length+` reponses)</i></div>
+                                            </div>
+                                            <div class='reply_trigger' com-id='` + comment.split("_+_")[0] + `' style='cursor:pointer;'><img class='com_hook com_hook_` + comment.split("_+_")[0] + `' src='../../model/ico/reply.png' height='13px' draggable='false'></div>
+                                        </div>
+                                        <div class='drawer drawer_` + comment.split("_+_")[0] + `' style='border-top:#9b9b9b solid 1px; padding-left:35px; font-size:12px; background-color:#d3d3d3; border-radius:0px 0px 4px 4px; display:none;'>
+                                        </div>
+                                    </div>
+                                `)
+
+                                            //
+                                            $.each(replies, function(k, reply) {
+                                                $(".drawer_" + comment.split("_+_")[0]).append(`<div style='border-bottom:#9b9b9b solid 1px;'><b>` + reply.split("_+_")[0] + `:</b> ` + reply.split("_+_")[1] + ` <span style='filter:opacity(0.6);'>| ` + reply.split("_+_")[2] + `</span></div>`)
+                                            })
+
+                                        }
+                                    }
+                                })
+                            })
+                            $(".comment_modal").css("display", "flex")
+                        }
+                    }
+                })
+            })
+
+            $("body").on("click", ".com_comer", function() {
+                let id = $(this).attr("class").split(" ")[1].split("_")[1]
+                $(".drawer").hide()
+                $(".drawer_" + id).show()
+            })
+
+            $("body").on("click", ".reply_trigger", function() {
+                let comID = $(this).attr("com-id")
+
+                if (replyMode == 1) {
+
+                    $(".com_hook").css("filter", "invert(0)")
+                    $(".com_hook_" + comID).css("filter", "invert(1)")
+                    $(".com_comer").css("background-color", "white")
+                    $(".com_comer").css("color", "black")
+                    $(".com_" + comID).css("background-color", "#6b3cb8")
+                    $(".com_" + comID).css("color", "white")
+
+                    replyTo = comID
+                    replyMode = 0
+                } else {
+
+                    if (replyTo == comID) {
+
+                        $(".com_hook").css("filter", "invert(0)")
+                        $(".com_comer").css("background-color", "white")
+                        $(".com_comer").css("color", "black")
+
+                        replyTo = null
+                        replyMode = 1
+                    } else {
+
+                        $(".com_hook").css("filter", "invert(0)")
+                        $(".com_hook_" + comID).css("filter", "invert(1)")
+                        $(".com_comer").css("background-color", "white")
+                        $(".com_comer").css("color", "black")
+                        $(".com_" + comID).css("background-color", "#6b3cb8")
+                        $(".com_" + comID).css("color", "white")
+
+                        replyTo = comID
+                    }
+                }
+            })
+
+            $(".submit_cmt").on("click", function() {
+                //
+                let content = $(".cmt_content").val()
+                $.ajax({
+                    url: "../../controller/core.php",
+                    method: "POST",
+
+                    data: {
+                        newCommentTrigger: true,
+                        pid: viewedPostID,
+                        text: content,
+                        submitter: userID,
+                        mode: replyMode,
+                        to: replyTo,
+                    },
+
+                    beforeSend: function() {
+                        $(".cmt_content").attr("disabled", true)
+                    },
+
+                    success: function(data) {
+                        if (data == 1) {
+                            alert("Une erreur s'est produite lors de la soumission de votre commentaire!")
+                        } else {
+                            $(".cmt_content").val("")
+                            $(".comment_modal").css("display", "none")
+
+                            let cmtCount = parseInt($("#cmt_cnt_" + viewedPostID).text())
+                            $("#cmt_cnt_" + viewedPostID).html(cmtCount + 1)
+                        }
+                        $(".cmt_content").attr("disabled", false)
+                        replyMode = 1
+                        replyTo = null
                     }
                 })
             })
@@ -201,7 +379,7 @@ $p_e = mysqli_query($link, $p_q);
                                 </div>
                                 <div style="display: flex;" post-id="<?= $post['id'] ?>">
                                     <div class="like_btn" id="like_<?= $post['id'] ?>" style="margin-top: auto; margin-bottom: auto; background-color: <?= $postLiked ? "#2e62d3" : "#99a5b3" ?>; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; margin-right: 4px; display: flex;"><img src="../../model/ico/like.png" draggable="false" width="15px" style="margin-right: 4px; filter: invert();"><span class="like_cnt" id="like_cnt_<?= $post['id'] ?>"><?= $post['post_likes'] ?></span></div>
-                                    <div class="cmt_btn" id="cmt_<?= $post['id'] ?>" style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;"><?= $post['post_cmt'] ?></div>
+                                    <div class="cmt_btn" id="cmt_<?= $post['id'] ?>" style="margin-top: auto; margin-bottom: auto; background-color: #d32e2e; color: white; padding: 6px; font-weight: bold; border-radius: 10px; padding-left: 12px; padding-right: 12px; cursor: pointer; display: flex;"><img src="../../model/ico/comment.png" draggable="false" width="25px" style="margin-right: 4px;"><span class="cmt_cnt" id="cmt_cnt_<?= $post['id'] ?>"><?= $post['post_cmt'] ?></span></div>
                                 </div>
                             </div>
 
@@ -322,6 +500,25 @@ $p_e = mysqli_query($link, $p_q);
                     </div>
                 </form>
 
+            </div>
+        </div>
+    </div>
+
+    <div class="comment_modal" style="background-color: rgba(0, 0, 0, 0.705); z-index: 2; position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: none; justify-content: right;">
+        <div style="margin-top: auto; margin-bottom: auto; margin-right:12px; background-color: white; border-radius: 4px; padding: 5px; width: 360px;">
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 30px;"></div>
+                <div style="font-size: 20px; font-weight: bold;">Commentaires</div>
+                <div style="width: 30px;"><span style="border-radius: 50%; background-color: #d32e2e; color: white; font-weight: bold; padding-left: 6px; padding-right: 6px; padding-top: 2px; padding-bottom: 2px; cursor: pointer;" class="comment_close">X</span></div>
+            </div>
+            <hr>
+            <div class="cmt_div" style="border-bottom: #4e4e4e41 solid 1px; background-color: #dfdfdf; min-height: 100px; max-height: 400px; overflow-x: hidden; overflow-y: auto; padding: 4px;">
+                ...
+            </div>
+            <hr>
+            <div style="display: flex; justify-content: center;">
+                <div style="width: 80%;"><input type="text" class="cmt_content" style="width: 100%; border-radius: 8px; outline: none; border: #4e4e4e41 solid 1px; background-color: #dfdfdf; padding: 7px;" placeholder="Exprimez-vous..."></div>
+                <div class="submit_cmt" style="background-image: url('../../model/ico/send.png'); background-position: center; background-repeat: no-repeat; background-size: 15px; border-radius: 50%; background-color: #6b3cb8; height: 33px; width: 33px; cursor: pointer; margin-left: 5px;"></div>
             </div>
         </div>
     </div>
